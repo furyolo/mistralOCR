@@ -43,6 +43,14 @@ python -m src.main --gui
 python -m src.main --file <文件路径> --api-key <API密钥>
 ```
 
+### Windows下运行
+
+在Windows系统中，您可以直接双击运行 `run.bat` 文件来启动程序。
+
+```bash
+# 直接双击 run.bat 文件
+```
+
 ## 项目结构
 
 ```
@@ -71,6 +79,8 @@ mistralOCR/
     "api_key": "your-api-key"
 }
 ```
+
+请注意，您可以在以下网址获取Mistral API Key: [https://console.mistral.ai/](https://console.mistral.ai/)
 
 ## 开发说明
 
