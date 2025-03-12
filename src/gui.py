@@ -2,6 +2,7 @@
 GUI模块，提供图形用户界面功能
 """
 import tkinter as tk
+import traceback
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
 import os
@@ -69,22 +70,39 @@ class OCRGUI:
         """加载保存的配置"""
         api_key = self.config.get('api_key', '')
         self.api_key_var.set(api_key)
-    
+
     def _select_file(self) -> None:
         """选择要处理的文件"""
-        filetypes = [
-            ("所有支持的文件", "*.pdf;*.jpg;*.jpeg;*.png"),
-            ("PDF文件", "*.pdf"),
-            ("图片文件", "*.jpg;*.jpeg;*.png"),
-            ("所有文件", "*.*")
-        ]
-        filename = filedialog.askopenfilename(
-            title="选择文件",
-            filetypes=filetypes
-        )
-        if filename:
-            self.file_path_var.set(filename)
-    
+        try:
+            # 明确指定每个文件类型的独立元组
+            filetypes = [
+                ("PDF Documents", "*.pdf"),
+                ("JPEG Images", "*.jpg"),
+                ("JPEG Images", "*.jpeg"),
+                ("PNG Images", "*.png"),
+                ("All Files", "*")
+            ]
+
+            # 添加防御性空值检查
+            initialdir = os.path.expanduser("~/Documents") if Path("~/Documents").exists() else None
+
+            filename = filedialog.askopenfilename(
+                title="选择文件",
+                filetypes=filetypes,
+                defaultextension=".pdf",
+                initialdir=initialdir
+            )
+
+            if filename:
+                self.file_path_var.set(filename)
+
+        except Exception as e:
+            self.status_var.set("文件选择失败")
+            error_msg = f"无法选择文件: {str(e)}"
+            self._update_result_text(error_msg)
+            messagebox.showerror("文件错误", error_msg)
+            print(f"DEBUG - 文件对话框错误: {traceback.format_exc()}")
+
     def _update_result_text(self, text: str) -> None:
         """
         更新结果显示区域的文本
