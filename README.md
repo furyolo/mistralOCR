@@ -25,6 +25,12 @@ cd mistralOCR
 pip install -r requirements.txt
 ```
 
+3. macOS上安装Tkinter(@后的版本号须与虚拟环境版本一致):
+```
+ brew install python-tk@3.11
+```
+
+
 ## 使用方法
 
 ### 图形界面
