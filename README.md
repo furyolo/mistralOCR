@@ -25,6 +25,14 @@ cd mistralOCR
 pip install -r requirements.txt
 ```
 
+3. 安装tkinter（如果尚未安装）：
+
+在Mac上，您可以使用以下命令安装tkinter：
+
+```bash
+brew install python-tk
+```
+
 ## 使用方法
 
 ### 图形界面

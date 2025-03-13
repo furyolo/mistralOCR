@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
 import os
+import platform
 
 from .config import Config
 from .ocr import process_file
@@ -23,10 +24,19 @@ class OCRGUI:
         self.root.title("Mistral OCR 处理工具")
         self.root.geometry("600x400")
         
+        # 在Mac系统上提升窗口
+        if platform.system() == 'Darwin':
+            self.root.createcommand('tk::mac::ReopenApplication', self.root.lift)
+            
         self.config = Config()
         
         self._init_ui()
         self._load_saved_config()
+        
+        # 确保窗口被激活
+        self.root.lift()
+        self.root.attributes('-topmost', True)
+        self.root.after_idle(self.root.attributes, '-topmost', False)
     
     def _init_ui(self) -> None:
         """初始化用户界面"""
@@ -64,6 +74,11 @@ class OCRGUI:
         self.result_text.grid(row=5, column=0, columnspan=3, pady=5)
         self.result_text.insert('1.0', '处理结果将显示在这里...\n')
         self.result_text.config(state='disabled')
+        
+        # 配置窗口大小调整
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+        self.main_frame.columnconfigure(1, weight=1)
     
     def _load_saved_config(self) -> None:
         """加载保存的配置"""
@@ -73,17 +88,28 @@ class OCRGUI:
     def _select_file(self) -> None:
         """选择要处理的文件"""
         filetypes = [
-            ("所有支持的文件", "*.pdf;*.jpg;*.jpeg;*.png"),
+            ("所有支持的文件", "*.pdf *.jpg *.jpeg *.png"),
             ("PDF文件", "*.pdf"),
-            ("图片文件", "*.jpg;*.jpeg;*.png"),
+            ("图片文件", "*.jpg *.jpeg *.png"),
             ("所有文件", "*.*")
         ]
-        filename = filedialog.askopenfilename(
-            title="选择文件",
-            filetypes=filetypes
-        )
-        if filename:
-            self.file_path_var.set(filename)
+        
+        # 确保对话框在主窗口之上
+        self.root.lift()
+        self.root.focus_force()
+        
+        try:
+            filename = filedialog.askopenfilename(
+                title="选择文件",
+                filetypes=filetypes,
+                parent=self.root
+            )
+            
+            if filename:
+                self.file_path_var.set(filename)
+                self.root.focus_force()  # 重新获取焦点
+        except Exception as e:
+            messagebox.showerror("错误", f"选择文件时出错：{str(e)}")
     
     def _update_result_text(self, text: str) -> None:
         """
